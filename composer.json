@@ -12,14 +12,18 @@
     "autoload": {
         "files": [
           "public/init.php"
-        ]
+        ],
+        "psr-4": {
+            "App\\": "src/"
+        }
       },
     "scripts": {
       "phpcs": "phpcs"
     },
     "require": {
         "slim/slim": "*",
-        "slim/psr7": "*"
+        "slim/psr7": "*",
+        "fzaninotto/faker": "^1.9"
     },
     "require-dev": {
       "squizlabs/php_codesniffer": "*"

@@ -35,18 +35,32 @@ $app->add(function (Request $request, RequestHandler $handler) {
     return $handler->handle($request);
 });
 
-// Add Error Handling Middleware
-$app->addErrorMiddleware(false, true, true);
-
-
 // Define app routes
 $app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello from Slim!");
+    $response->getBody()->write("Slim says you HELLO!");
     return $response;
 });
 
 $app->get('/users', function (Request $request, Response $response, $args) {
-    $response->getBody()->write('GET /users');
+    $users = App\Generator::generateUsers(10);
+    $userRows = array_map(function ($user) {
+        return "<tr>"
+            . "<td>{$user['id']}</td>"
+            . "<td>{$user['name']}</td>"
+            . "<td>{$user['phone']}</td>"
+            . "<td>{$user['address']}</td>"
+            . "</tr>";
+    }, $users);
+    $userTableData = implode("\n", $userRows);
+    $tableHeader = <<<EOT
+    <tr>
+        <th>ID</th>
+        <th>NAME</th>
+        <th>PHONE</th>
+        <th>ADDRESS</th>
+    </tr>
+EOT;
+    $response->getBody()->write("<table>{$tableHeader}{$userTableData}</table>");
     return $response;
 });
 
