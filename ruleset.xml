@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- custom ruleset for php_codesniffer -->
+<ruleset name="CustomStandard">
+    <description>A custom coding standard.</description>
+    <rule ref="Squiz.NamingConventions.ValidVariableName"/>
+</ruleset>

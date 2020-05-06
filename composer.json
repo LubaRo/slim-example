@@ -1,5 +1,27 @@
 {
+    "name": "lubaro/my-php-web-app",
+    "description": "Learning project with using Slim micro framework on php.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "LubaRo",
+        "email": "user.luyba@gmail.com"
+      }
+    ],
+    "autoload": {
+        "files": [
+          "public/init.php"
+        ]
+      },
+    "scripts": {
+      "phpcs": "phpcs"
+    },
     "require": {
-        "slim/slim": "^3.0"
+        "slim/slim": "*",
+        "slim/psr7": "*"
+    },
+    "require-dev": {
+      "squizlabs/php_codesniffer": "*"
     }
 }

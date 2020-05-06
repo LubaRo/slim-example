@@ -2,16 +2,17 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$configuration = [
-    'settings' => [
-        'displayErrorDetails' => true,
-    ],
-];
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Factory\AppFactory;
 
-$app = new \Slim\App($configuration);
+$app = AppFactory::create();
 
-$app->get('/', function ($request, $response) {
-    return $response->write('Welcome to Slim!');
+// Define app routes
+$app->get('/', function (Request $request, Response $response, $args) {
+    $response->getBody()->write("Hello from Slim!");
+    return $response;
 });
 
+// Run app
 $app->run();
