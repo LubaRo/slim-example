@@ -69,6 +69,23 @@ $app->post('/users', function (Request $request, Response $response) {
     return $response;
 });
 
+$app->get('/companies', function (Request $request, Response $response) {
+    $companiesData = App\Generator::generateCompanies(100);
+    $params = $request->getQueryParams();
+
+    $page = $params['page'] ?? 1;
+    $per = $params['per'] ?? 5;
+    $offset = ($page - 1) * $per;
+
+    $requestedData = array_slice($companiesData, $offset, $per);
+    $data = array_reduce($requestedData, function ($acc, $company) {
+        $acc[] = json_encode($company, JSON_PRETTY_PRINT);
+        return $acc;
+    }, []);
+
+    $response->getBody()->write(implode("<br>", $data));
+    return $response;
+});
 
 // Run app
 $app->run();

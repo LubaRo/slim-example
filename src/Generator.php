@@ -6,15 +6,12 @@ class Generator
 {
     public static function generateCompanies($count)
     {
-        $numbers = range(1, 100);
-        shuffle($numbers);
-
         $faker = \Faker\Factory::create();
         $faker->seed(1);
         $companies = [];
         for ($i = 0; $i < $count; $i++) {
             $companies[] = [
-                'id' => $numbers[$i],
+                'id' => $i + 1,
                 'name' => $faker->company,
                 'phone' => $faker->phoneNumber
             ];
