@@ -25,7 +25,8 @@
         "slim/psr7": "*",
         "fzaninotto/faker": "^1.9",
         "tightenco/collect": "^7.9",
-        "slim/php-view": "^2.2"
+        "slim/php-view": "^2.2",
+        "php-di/php-di": "^6.1"
     },
     "require-dev": {
       "squizlabs/php_codesniffer": "*"

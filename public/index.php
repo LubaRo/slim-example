@@ -7,11 +7,23 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Response;
 use Slim\Views\PhpRenderer;
+use DI\Container;
 
 const TEMPLATES_DIR_PATH = __DIR__ . '/../templates';
+const NOT_FOUND = 404;
+
+// Create Container using PHP-DI
+$container = new Container();
+
+// Set container to create App with on AppFactory
+AppFactory::setContainer($container);
 
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
+
+$container->set('renderService', function () {
+    return new PhpRenderer(TEMPLATES_DIR_PATH, ['title' => 'Default title']);
+});
 
 // Redirect and rewrite all URLs that end in a '/' to the non-trailing '/' equivalent
 $app->add(function (Request $request, RequestHandler $handler) {
@@ -41,42 +53,24 @@ $app->add(function (Request $request, RequestHandler $handler) {
 
 // Define app routes
 $app->get('/', function (Request $request, Response $response, $args) {
-    $templateVariables['links'] = [
-        [
-            'name' => 'Users',
-            'path' => '/users'
-        ],
-        [
-            'name' => 'Companies list',
-            'path' => '/companies'
-        ]
+    $links = [
+        ['name' => 'Users', 'path' => '/users'],
+        ['name' => 'Companies list', 'path' => '/companies']
     ];
-    $renderer = new PhpRenderer(TEMPLATES_DIR_PATH, ['title' => 'HOME']);
+    $renderer = $this->get('renderService');
+    $renderer->addAttribute('title', 'HOME');
     $renderer->setLayout("layout.php");
-    return $renderer->render($response, "index.php", $templateVariables);
+
+    return $renderer->render($response, "index.php", ['links' => $links]);
 });
 
 $app->get('/users', function (Request $request, Response $response, $args) {
+    $renderer = $this->get('renderService');
+    $renderer->addAttribute('title', 'Users');
+    $renderer->setLayout("layout.php");
     $users = App\Generator::generateUsers(10);
-    $userRows = array_map(function ($user) {
-        return "<tr>"
-            . "<td>{$user['id']}</td>"
-            . "<td>{$user['name']}</td>"
-            . "<td>{$user['phone']}</td>"
-            . "<td>{$user['address']}</td>"
-            . "</tr>";
-    }, $users);
-    $userTableData = implode("\n", $userRows);
-    $tableHeader = <<<EOT
-    <tr>
-        <th>ID</th>
-        <th>NAME</th>
-        <th>PHONE</th>
-        <th>ADDRESS</th>
-    </tr>
-EOT;
-    $response->getBody()->write("<table>{$tableHeader}{$userTableData}</table>");
-    return $response;
+
+    return $renderer->render($response, "users_list.php", ['users' => $users]);
 });
 
 $app->post('/users', function (Request $request, Response $response) {
@@ -85,44 +79,47 @@ $app->post('/users', function (Request $request, Response $response) {
 });
 
 $app->get('/companies', function (Request $request, Response $response) {
-    $companiesData = App\Generator::generateCompanies(100);
+    $companiesFullList = App\Generator::generateCompanies(100);
     $params = $request->getQueryParams();
 
     $page = $params['page'] ?? 1;
     $per = $params['per'] ?? 10;
     $offset = ($page - 1) * $per;
 
-    $requestedData = array_slice($companiesData, $offset, $per);
-    $data = array_reduce($requestedData, function ($acc, $company) {
-        $acc[] = "<a href=\"\\company\\{$company['id']}\">{$company['name']}</a>";
-        return $acc;
-    }, []);
+    $companies = array_slice($companiesFullList, $offset, $per);
+    $renderer = $this->get('renderService');
+    if (!$companies) {
+        $renderer->addAttribute('title', 'Not found');
+        $newResponse = $response->withStatus(NOT_FOUND);
+        return $renderer->render($newResponse, "not_found.php");
+    }
+    $renderer->addAttribute('title', 'Companies');
+    $renderer->setLayout("layout.php");
 
-    $response->getBody()->write(implode("<br>", $data));
-    return $response;
+    $paging = [
+        'total' => ceil(sizeof($companiesFullList) / $per),
+        'current' => $page
+    ];
+
+    return $renderer->render($response, "companies_list.php", ['companies' => $companies, 'paging' => $paging]);
 });
 
 $app->get('/company/{id}', function (Request $request, Response $response, array $args) {
     $companyId = $args['id'];
     $companiesList = App\Generator::generateCompanies(100);
     $companyData = collect($companiesList)->firstWhere('id', $companyId);
+    $renderer = $this->get('renderService');
 
     if (!$companyData) {
-        $response->getBody()->write("Page not found.. :(");
-        return $response->withStatus(404);
+        $renderer->addAttribute('title', 'Not found');
+        $newResponse = $response->withStatus(NOT_FOUND);
+        return $renderer->render($newResponse, "not_found.php");
     }
-    $data = '';
-    foreach ($companyData as $key => $value) {
-        $data .= "<p><b>$key:</b> $value</p>";
-    }
-    $response->getBody()->write($data);
-    return $response;
-});
 
-$app->get('/courses/{id}', function ($request, $response, array $args) {
-    $id = $args['id'];
-    $response->getBody()->write("Course id: {$id}");
-    return $response;
+    $renderer->addAttribute('title', $companyData['name']);
+    $renderer->setLayout("layout.php");
+
+    return $renderer->render($response, "company.php", ['company' => $companyData]);
 });
 
 // Run app
