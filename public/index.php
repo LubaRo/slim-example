@@ -6,6 +6,9 @@ use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Response;
+use Slim\Views\PhpRenderer;
+
+const TEMPLATES_DIR_PATH = __DIR__ . '/../templates';
 
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
@@ -38,17 +41,19 @@ $app->add(function (Request $request, RequestHandler $handler) {
 
 // Define app routes
 $app->get('/', function (Request $request, Response $response, $args) {
-    $body = <<<EOT
-    <h1>Slim says you HELLO!</h1>
-    <p>You can follow by these links:</p>
-    <ul>
-        <li><a href="/users">Users</a></li>
-        <li><a href="/companies">Companies</a></li>
-        <li><a href="/courses/5">5 course</a></li>
-    </ul>
-EOT;
-    $response->getBody()->write($body);
-    return $response;
+    $templateVariables['links'] = [
+        [
+            'name' => 'Users',
+            'path' => '/users'
+        ],
+        [
+            'name' => 'Companies list',
+            'path' => '/companies'
+        ]
+    ];
+    $renderer = new PhpRenderer(TEMPLATES_DIR_PATH, ['title' => 'HOME']);
+    $renderer->setLayout("layout.php");
+    return $renderer->render($response, "index.php", $templateVariables);
 });
 
 $app->get('/users', function (Request $request, Response $response, $args) {
