@@ -23,7 +23,8 @@
     "require": {
         "slim/slim": "*",
         "slim/psr7": "*",
-        "fzaninotto/faker": "^1.9"
+        "fzaninotto/faker": "^1.9",
+        "tightenco/collect": "^7.9"
     },
     "require-dev": {
       "squizlabs/php_codesniffer": "*"
