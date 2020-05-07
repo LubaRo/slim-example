@@ -37,7 +37,15 @@ $app->add(function (Request $request, RequestHandler $handler) {
 
 // Define app routes
 $app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Slim says you HELLO!");
+    $body = <<<EOT
+    <h1>Slim says you HELLO!</h1>
+    <p>You can follow by these links:</p>
+    <ul>
+        <li><a href="/users">Users</a></li>
+        <li><a href="companies">Companies</a></li>
+    </ul>
+EOT;
+    $response->getBody()->write($body);
     return $response;
 });
 
