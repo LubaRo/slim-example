@@ -9,7 +9,9 @@ use Slim\Psr7\Response;
 use Slim\Views\PhpRenderer;
 use DI\Container;
 
-const TEMPLATES_DIR_PATH = __DIR__ . '/../templates';
+const ROOT_DIR = __DIR__ . '/../';
+const TEMPLATES_DIR_PATH = ROOT_DIR . 'templates';
+const IMAGES_DIR = ROOT_DIR . 'images/';
 const NOT_FOUND = 404;
 
 // Create Container using PHP-DI
@@ -85,6 +87,7 @@ $app->get('/companies', function (Request $request, Response $response) {
     $page = $params['page'] ?? 1;
     $per = $params['per'] ?? 10;
     $offset = ($page - 1) * $per;
+    $search = '';
 
     $companies = array_slice($companiesFullList, $offset, $per);
     $renderer = $this->get('renderService');
@@ -101,7 +104,13 @@ $app->get('/companies', function (Request $request, Response $response) {
         'current' => $page
     ];
 
-    return $renderer->render($response, "companies_list.phtml", ['companies' => $companies, 'paging' => $paging]);
+    $templateData = [
+        'companies' => $companies,
+        'paging' => $paging,
+        'search' => $search
+    ];
+
+    return $renderer->render($response, "companies_list.phtml", $templateData);
 });
 
 $app->get('/company/{id}', function (Request $request, Response $response, array $args) {
@@ -122,12 +131,17 @@ $app->get('/company/{id}', function (Request $request, Response $response, array
     return $renderer->render($response, "company.phtml", ['company' => $companyData]);
 });
 
-$app->get('/test', function (Request $request, Response $response, $args) {
+$app->get('/images/{img}', function (Request $request, Response $response, array $args) {
+    $imageName = $args['img'];
+    $imagePath = IMAGES_DIR .  $imageName;
 
-    $params = $request->getQueryParams();
-
-    $response->getBody()->write("Trying to attack!" .htmlspecialchars($params['some']));
-    return $response;
+    $image = @file_get_contents($imagePath);
+    if ($image === false) {;
+        $response->getBody()->write("Could not find '$imageName'.");
+        return $response->withStatus(404);
+    };
+    $response->getBody()->write($image);
+    return $response->withHeader('Content-Type', 'image/jpeg');
 });
 
 // Run app
