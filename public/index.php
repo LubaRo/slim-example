@@ -59,18 +59,18 @@ $app->get('/', function (Request $request, Response $response, $args) {
     ];
     $renderer = $this->get('renderService');
     $renderer->addAttribute('title', 'HOME');
-    $renderer->setLayout("layout.php");
+    $renderer->setLayout("layout.phtml");
 
-    return $renderer->render($response, "index.php", ['links' => $links]);
+    return $renderer->render($response, "index.phtml", ['links' => $links]);
 });
 
 $app->get('/users', function (Request $request, Response $response, $args) {
     $renderer = $this->get('renderService');
     $renderer->addAttribute('title', 'Users');
-    $renderer->setLayout("layout.php");
+    $renderer->setLayout("layout.phtml");
     $users = App\Generator::generateUsers(10);
 
-    return $renderer->render($response, "users_list.php", ['users' => $users]);
+    return $renderer->render($response, "users_list.phtml", ['users' => $users]);
 });
 
 $app->post('/users', function (Request $request, Response $response) {
@@ -91,17 +91,17 @@ $app->get('/companies', function (Request $request, Response $response) {
     if (!$companies) {
         $renderer->addAttribute('title', 'Not found');
         $newResponse = $response->withStatus(NOT_FOUND);
-        return $renderer->render($newResponse, "not_found.php");
+        return $renderer->render($newResponse, "not_found.phtml");
     }
     $renderer->addAttribute('title', 'Companies');
-    $renderer->setLayout("layout.php");
+    $renderer->setLayout("layout.phtml");
 
     $paging = [
         'total' => ceil(sizeof($companiesFullList) / $per),
         'current' => $page
     ];
 
-    return $renderer->render($response, "companies_list.php", ['companies' => $companies, 'paging' => $paging]);
+    return $renderer->render($response, "companies_list.phtml", ['companies' => $companies, 'paging' => $paging]);
 });
 
 $app->get('/company/{id}', function (Request $request, Response $response, array $args) {
@@ -113,13 +113,21 @@ $app->get('/company/{id}', function (Request $request, Response $response, array
     if (!$companyData) {
         $renderer->addAttribute('title', 'Not found');
         $newResponse = $response->withStatus(NOT_FOUND);
-        return $renderer->render($newResponse, "not_found.php");
+        return $renderer->render($newResponse, "not_found.phtml");
     }
 
-    $renderer->addAttribute('title', $companyData['name']);
-    $renderer->setLayout("layout.php");
+    $renderer->addAttribute('title', "Company: {$companyData['name']}");
+    $renderer->setLayout("layout.phtml");
 
-    return $renderer->render($response, "company.php", ['company' => $companyData]);
+    return $renderer->render($response, "company.phtml", ['company' => $companyData]);
+});
+
+$app->get('/test', function (Request $request, Response $response, $args) {
+
+    $params = $request->getQueryParams();
+
+    $response->getBody()->write("Trying to attack!" .htmlspecialchars($params['some']));
+    return $response;
 });
 
 // Run app
