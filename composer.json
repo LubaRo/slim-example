@@ -11,7 +11,8 @@
     ],
     "autoload": {
         "files": [
-          "public/init.php"
+          "helpers/init.php",
+          "helpers/functions.php"
         ],
         "psr-4": {
             "App\\": "src/"

@@ -9,10 +9,10 @@ use Slim\Psr7\Response;
 use Slim\Views\PhpRenderer;
 use DI\Container;
 
-const ROOT_DIR = __DIR__ . '/../';
-const TEMPLATES_DIR_PATH = ROOT_DIR . 'templates';
-const IMAGES_DIR = ROOT_DIR . 'images/';
-const NOT_FOUND = 404;
+define('ROOT_DIR', __DIR__ . '/../');
+define('TEMPLATES_DIR_PATH', ROOT_DIR . 'templates');
+define('IMAGES_DIR', ROOT_DIR . 'images/');
+define('NOT_FOUND', 404);
 
 // Create Container using PHP-DI
 $container = new Container();
@@ -63,21 +63,56 @@ $app->get('/', function (Request $request, Response $response, $args) {
     $renderer->addAttribute('title', 'HOME');
     $renderer->setLayout("layout.phtml");
 
-    return $renderer->render($response, "index.phtml", ['links' => $links]);
+    $params = $request->getQueryParams();
+    $search = $params['search'] ?? '';
+
+    $searchData = ['test', 'goal', 'php', 'slim', 'OOP', 'manifest'];
+    $foundData = [];
+    if ($search) {
+        $foundData = array_filter($searchData, function ($elem) use ($search) {
+            return strpos($elem, $search);
+        });
+    }
+    $templateData = [
+        'links' => $links,
+        'search' => htmlspecialchars($search),
+        'foundData' => $foundData
+    ];
+
+    return $renderer->render($response, "index.phtml", $templateData);
 });
 
 $app->get('/users', function (Request $request, Response $response, $args) {
     $renderer = $this->get('renderService');
     $renderer->addAttribute('title', 'Users');
     $renderer->setLayout("layout.phtml");
-    $users = App\Generator::generateUsers(10);
+    $users = getUsers();
 
     return $renderer->render($response, "users_list.phtml", ['users' => $users]);
 });
 
+$app->get('/users/new', function (Request $request, Response $response, $args) {
+    $renderer = $this->get('renderService');
+    $renderer->addAttribute('title', 'New user');
+    $renderer->setLayout("layout.phtml");
+
+    return $renderer->render($response, "users_new.phtml");
+});
+
 $app->post('/users', function (Request $request, Response $response) {
-    $response->getBody()->write('POST /users');
-    return $response;
+    $allUsers = getUsers();
+    $request = $request->getParsedBody();
+    $userData = $request['user'];
+    $lastUser = collect($allUsers)->last();
+
+    $userData['id'] = $lastUser ? $lastUser['id'] + 1 : 1;
+    $allUsers[] = $userData;
+
+    saveUsers($allUsers);
+    $response = new Response();
+    return $response
+        ->withHeader('Location', '/users')
+        ->withStatus(302);
 });
 
 $app->get('/companies', function (Request $request, Response $response) {
