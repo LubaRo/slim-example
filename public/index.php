@@ -87,7 +87,6 @@ $app->get('/companies', function (Request $request, Response $response) {
     $page = $params['page'] ?? 1;
     $per = $params['per'] ?? 10;
     $offset = ($page - 1) * $per;
-    $search = '';
 
     $companies = array_slice($companiesFullList, $offset, $per);
     $renderer = $this->get('renderService');
@@ -106,8 +105,7 @@ $app->get('/companies', function (Request $request, Response $response) {
 
     $templateData = [
         'companies' => $companies,
-        'paging' => $paging,
-        'search' => $search
+        'paging' => $paging
     ];
 
     return $renderer->render($response, "companies_list.phtml", $templateData);
