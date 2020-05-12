@@ -1,0 +1,19 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    {% for company in companies %}
+    <div>
+        <a href="{{ url_for('company', { 'id': company.id }) }}">{{ company.name }}</a>
+        
+    </div>
+    {% endfor %}
+
+    <div class="pager">
+    {% for i in 1..10 %}
+        <span class="{% if i == paging.current %}current-page {% endif %}some-class">
+            <a href="{{ url_for('companies') }}?page={{ i }}">{{ i }}</a>
+        </span>
+    {% endfor %}
+    </div>
+
+{% endblock %}

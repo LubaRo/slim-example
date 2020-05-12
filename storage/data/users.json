@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Ivan Zelt",
+        "email": "test@mail.com",
+        "phone": "+2543",
+        "id": 1
+    },
+    {
+        "name": "Ivan Zelt2",
+        "email": "test@mail.com",
+        "phone": "+2543",
+        "id": 2
+    },
+    {
+        "name": "Yaroslav",
+        "email": "sun@mail.com",
+        "phone": "000-373",
+        "id": 3
+    },
+    {
+        "name": "Yaroslav",
+        "email": "ff@fd.s",
+        "phone": "+2543",
+        "id": 4
+    },
+    {
+        "name": "Amilly",
+        "email": "test@mail.com",
+        "phone": "+77-33",
+        "id": 5
+    },
+    {
+        "name": "Andrey Gow",
+        "email": "gow@mail.com",
+        "phone": "27-15-42",
+        "id": 6
+    }
+]

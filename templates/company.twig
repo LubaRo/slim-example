@@ -1,0 +1,10 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <h1>Company profile</h1>
+
+    {% for key,value in company %}
+        <p><b>{{ key }}:</b> {{ value }}</p>
+    {% endfor %}
+    <a href="{{ url_for('companies') }}">Back to list</a>
+{% endblock %}

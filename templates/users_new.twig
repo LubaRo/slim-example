@@ -1,6 +1,9 @@
+{% extends 'base.twig' %}
+
+{% block content %}
 <h1>Adding new user</h1>
 
-<form action="/users" method="post">
+<form action="{{ url_for('users') }}" method="post">
     <div>
         <label>Username:
             <input type="text" name="user[name]">
@@ -16,5 +19,6 @@
               <input type="tel" required name="user[phone]">
           </label>
       </div>
-    <input type="submit" value="Sign Up">
-  </form>
+    <input type="submit" value="Add">
+</form>
+{% endblock %}

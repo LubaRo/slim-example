@@ -1,0 +1,40 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <h1>Slim says you HELLO and WELCOME!</h1>
+    <p>This is the twig content ^-^</p>
+
+    <div class="main-content">
+        <form action="/" method="get">
+            <input type="search" name="search" value="{{ search }}" placeholder="Search something" />
+            <input type="submit" value="Search" />
+        </form>
+
+        {% block searchForm %}
+            {% if foundData %}
+                <div class="bordered">
+                    <p>Hooray! You found something ^-^</p>
+                    {% for data in foundData %}
+                        <p><i>{{ data }}</i></p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endblock %}
+    </div>
+
+    <div class="links-list">
+        <p>Also you can follow by these links:</p>
+        <ul>
+        {% for link in links %}
+            <li><a href="{{ link.path }}">{{ link.name }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+<div class="footer">
+    <i>Powered by Sim framework</i>
+</div>
+{% endblock %}

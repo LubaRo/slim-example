@@ -6,26 +6,24 @@ use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Response;
-use Slim\Views\PhpRenderer;
 use DI\Container;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 
-define('ROOT_DIR', __DIR__ . '/../');
-define('TEMPLATES_DIR_PATH', ROOT_DIR . 'templates');
-define('IMAGES_DIR', ROOT_DIR . 'images/');
-define('NOT_FOUND', 404);
-
-// Create Container using PHP-DI
 $container = new Container();
-
-// Set container to create App with on AppFactory
 AppFactory::setContainer($container);
+
+$container->set('view', function() {
+    $params = [
+        'cache' => CACHE_DIR . 'twig/',
+        'auto_reload' => true
+    ];
+    return Twig::create(TEMPLATES_DIR_PATH, $params);
+});
 
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
-
-$container->set('renderService', function () {
-    return new PhpRenderer(TEMPLATES_DIR_PATH, ['title' => 'Default title']);
-});
+$app->add(TwigMiddleware::createFromContainer($app));
 
 // Redirect and rewrite all URLs that end in a '/' to the non-trailing '/' equivalent
 $app->add(function (Request $request, RequestHandler $handler) {
@@ -49,19 +47,15 @@ $app->add(function (Request $request, RequestHandler $handler) {
             $request = $request->withUri($uri);
         }
     }
-
     return $handler->handle($request);
 });
 
-// Define app routes
 $app->get('/', function (Request $request, Response $response, $args) {
     $links = [
         ['name' => 'Users', 'path' => '/users'],
         ['name' => 'Companies list', 'path' => '/companies']
     ];
-    $renderer = $this->get('renderService');
-    $renderer->addAttribute('title', 'HOME');
-    $renderer->setLayout("layout.phtml");
+    $renderer = $this->get('view');
 
     $params = $request->getQueryParams();
     $search = $params['search'] ?? '';
@@ -74,30 +68,29 @@ $app->get('/', function (Request $request, Response $response, $args) {
         });
     }
     $templateData = [
+        'title' => 'HOME',
         'links' => $links,
         'search' => htmlspecialchars($search),
         'foundData' => $foundData
     ];
 
-    return $renderer->render($response, "index.phtml", $templateData);
+    return $renderer->render($response, "index.twig", $templateData);
 });
 
 $app->get('/users', function (Request $request, Response $response, $args) {
-    $renderer = $this->get('renderService');
-    $renderer->addAttribute('title', 'Users');
-    $renderer->setLayout("layout.phtml");
+    $renderer = $this->get('view');
     $users = getUsers();
+    $data = ['title' => 'Users', 'users' => $users];
 
-    return $renderer->render($response, "users_list.phtml", ['users' => $users]);
-});
+    return $renderer->render($response, "users.twig", $data);
+})->setName('users');;
 
 $app->get('/users/new', function (Request $request, Response $response, $args) {
-    $renderer = $this->get('renderService');
-    $renderer->addAttribute('title', 'New user');
-    $renderer->setLayout("layout.phtml");
+    $renderer = $this->get('view');
+    $data = ['title' => 'Create user'];
 
-    return $renderer->render($response, "users_new.phtml");
-});
+    return $renderer->render($response, "users_new.twig", $data);
+})->setName('newUser');
 
 $app->post('/users', function (Request $request, Response $response) {
     $allUsers = getUsers();
@@ -124,46 +117,46 @@ $app->get('/companies', function (Request $request, Response $response) {
     $offset = ($page - 1) * $per;
 
     $companies = array_slice($companiesFullList, $offset, $per);
-    $renderer = $this->get('renderService');
+    $renderer = $this->get('view');
     if (!$companies) {
         $renderer->addAttribute('title', 'Not found');
         $newResponse = $response->withStatus(NOT_FOUND);
         return $renderer->render($newResponse, "not_found.phtml");
     }
-    $renderer->addAttribute('title', 'Companies');
-    $renderer->setLayout("layout.phtml");
 
     $paging = [
         'total' => ceil(sizeof($companiesFullList) / $per),
         'current' => $page
     ];
 
-    $templateData = [
+    $data = [
+        'title' => 'COMPANIES',
         'companies' => $companies,
         'paging' => $paging
     ];
 
-    return $renderer->render($response, "companies_list.phtml", $templateData);
-});
+    return $renderer->render($response, "companies_list.twig", $data);
+})->setName('companies');
 
 $app->get('/company/{id}', function (Request $request, Response $response, array $args) {
     $companyId = $args['id'];
     $companiesList = App\Generator::generateCompanies(100);
     $companyData = collect($companiesList)->firstWhere('id', $companyId);
-    $renderer = $this->get('renderService');
+    $renderer = $this->get('view');
 
     if (!$companyData) {
-        $renderer->addAttribute('title', 'Not found');
         $newResponse = $response->withStatus(NOT_FOUND);
-        return $renderer->render($newResponse, "not_found.phtml");
+        return $renderer->render($newResponse, "not_found.twig", ['title' => 'Not found']);
     }
 
-    $renderer->addAttribute('title', "Company: {$companyData['name']}");
-    $renderer->setLayout("layout.phtml");
+    $data = [
+        'title' => "Company: {$companyData['name']}",
+        'company' => $companyData
+    ];
+    return $renderer->render($response, "company.twig", $data);
+})->setName('company');
 
-    return $renderer->render($response, "company.phtml", ['company' => $companyData]);
-});
-
+/* Hack - need to fix */
 $app->get('/images/{img}', function (Request $request, Response $response, array $args) {
     $imageName = $args['img'];
     $imagePath = IMAGES_DIR .  $imageName;
@@ -175,7 +168,20 @@ $app->get('/images/{img}', function (Request $request, Response $response, array
     };
     $response->getBody()->write($image);
     return $response->withHeader('Content-Type', 'image/jpeg');
-});
+})->setName('images');
+/* Hack - need to fix */
+$app->get('/styles/{file}', function (Request $request, Response $response, array $args) {
+    $fileName = $args['file'];
+    $filePath = ROOT_DIR . 'public/styles/' . $fileName;
+
+    $content = @file_get_contents($filePath);
+    if ($content === false) {;
+        $response->getBody()->write("Could not open '$fileName'.");
+        return $response->withStatus(404);
+    };
+    $response->getBody()->write($content);
+    return $response->withHeader('Content-Type', 'text/css');
+})->setName('styles');
 
 // Run app
 $app->run();
