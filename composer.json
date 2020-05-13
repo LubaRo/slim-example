@@ -9,6 +9,9 @@
         "email": "user.luyba@gmail.com"
       }
     ],
+    "config": {
+      "sort-packages": true
+    },
     "autoload": {
         "files": [
           "helpers/init.php",
@@ -22,13 +25,13 @@
       "phpcs": "phpcs"
     },
     "require": {
-        "slim/slim": "*",
-        "slim/psr7": "*",
         "fzaninotto/faker": "^1.9",
-        "tightenco/collect": "^7.9",
         "php-di/php-di": "^6.1",
-        "slim/twig-view": "^3.0",
-        "slim/flash": "^0.4.0"
+        "slim/flash": "^0.4.0",
+        "slim/psr7": "^1.1",
+        "slim/slim": "^4.5",
+        "slim/twig-view": "^3.1",
+        "tightenco/collect": "^7.10"
     },
     "require-dev": {
       "squizlabs/php_codesniffer": "*"
