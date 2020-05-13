@@ -49,11 +49,12 @@ $app->add(function (Request $request, RequestHandler $handler) {
     }
     return $handler->handle($request);
 });
+$routeParser = $app->getRouteCollector()->getRouteParser();
 
-$app->get('/', function (Request $request, Response $response, $args) {
+$app->get('/', function (Request $request, Response $response, $args) use ($routeParser) {
     $links = [
-        ['name' => 'Users', 'path' => '/users'],
-        ['name' => 'Companies list', 'path' => '/companies']
+        ['name' => 'Users', 'path' => $routeParser->urlFor('users')],
+        ['name' => 'Companies list', 'path' => $routeParser->urlFor('companies')]
     ];
     $renderer = $this->get('view');
 
