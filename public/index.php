@@ -9,6 +9,7 @@ use Slim\Psr7\Response;
 use DI\Container;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use App\Validator;
 
 $container = new Container();
 AppFactory::setContainer($container);
@@ -93,19 +94,30 @@ $app->get('/users/new', function (Request $request, Response $response, $args) {
     return $renderer->render($response, "users_new.twig", $data);
 })->setName('newUser');
 
-$app->post('/users', function (Request $request, Response $response) {
-    $allUsers = getUsers();
+$app->post('/users', function (Request $request, Response $response) use ($routeParser) {
+    $validator = new Validator;
+    $renderer = $this->get('view');
     $request = $request->getParsedBody();
     $userData = $request['user'];
+    $errors = $validator->validate($userData);
+
+    if ($errors) {
+        $data = [
+            'title' => 'Create user',
+            'errors' => $errors
+        ];
+        return $renderer->render($response, "users_new.twig", $data);
+    }
+
+    $allUsers = getUsers();
     $lastUser = collect($allUsers)->last();
-
     $userData['id'] = $lastUser ? $lastUser['id'] + 1 : 1;
-    $allUsers[] = $userData;
 
+    $allUsers[] = $userData;
     saveUsers($allUsers);
-    $response = new Response();
+
     return $response
-        ->withHeader('Location', '/users')
+        ->withHeader('Location',$routeParser->urlFor('users'))
         ->withStatus(302);
 });
 
