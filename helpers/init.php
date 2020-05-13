@@ -1,9 +1,5 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 define('ROOT_DIR', __DIR__ . '/../');
 define('TEMPLATES_DIR_PATH', ROOT_DIR . 'templates');
 define('CACHE_DIR', ROOT_DIR . 'storage/cache/');

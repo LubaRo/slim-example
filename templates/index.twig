@@ -6,28 +6,27 @@
 
     <div class="main-content">
         <form action="/" method="get">
-            <input type="search" name="search" value="{{ search }}" placeholder="Search something" />
+            <input type="search" name="search" value="{{ search }}" placeholder="Find your company" />
             <input type="submit" value="Search" />
         </form>
 
-        {% block searchForm %}
-            {% if foundData %}
-                <div class="bordered">
-                    <p>Hooray! You found something ^-^</p>
-                    {% for data in foundData %}
-                        <p><i>{{ data }}</i></p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endblock %}
+        {% if foundData %}
+            <div class="bordered">
+                <p>Hooray! You found something ^-^</p>
+                {% for company in foundData %}
+                    <p><a href="{{ url_for('company', { 'id': company.id }) }}">{{ company.name }}</a></p>
+                {% endfor %}
+            </div>
+        {% elseif search %}
+            <p>Sorry, we cannot find something suitable..</p>
+        {% endif %}
     </div>
 
     <div class="links-list">
         <p>Also you can follow by these links:</p>
         <ul>
-        {% for link in links %}
-            <li><a href="{{ link.path }}">{{ link.name }}</a></li>
-        {% endfor %}
+            <li><a href="{{ url_for('users') }}">Users</a></li>
+            <li><a href="{{ url_for('companies') }}">Our best companies</a></li>
         </ul>
     </div>
 
@@ -35,6 +34,6 @@
 
 {% block footer %}
 <div class="footer">
-    <i>Powered by Sim framework</i>
+    <i>Powered by Slim micro framework</i>
 </div>
 {% endblock %}

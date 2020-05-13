@@ -2,7 +2,8 @@
 
 namespace App;
 
-class Validator {
+class Validator
+{
     public function validate(array $course)
     {
         $errors = [];

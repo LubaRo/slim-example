@@ -1,0 +1,10 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <h1>User profile</h1>
+
+    {% for key,value in user %}
+        <p><b>{{ key }}:</b> {{ value }}</p>
+    {% endfor %}
+    <a href="{{ url_for('users') }}">Back to list</a>
+{% endblock %}
