@@ -8,6 +8,26 @@
         {% endblock %}
     </head>
     <body>
+        {% block notifications %}
+            {% if messages %}
+            <div class="notifications-bar">
+                {% if messages.error %}
+                    <div class="message-error">
+                        {% for message in messages.error %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if messages.success %}
+                    <div class="message-success">
+                        {% for message in messages.success %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% endblock %}
         {% block body %}
             <div id="content">
                 {% block content %}{% endblock %}

@@ -27,7 +27,8 @@
         "fzaninotto/faker": "^1.9",
         "tightenco/collect": "^7.9",
         "php-di/php-di": "^6.1",
-        "slim/twig-view": "^3.0"
+        "slim/twig-view": "^3.0",
+        "slim/flash": "^0.4.0"
     },
     "require-dev": {
       "squizlabs/php_codesniffer": "*"

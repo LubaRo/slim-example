@@ -40,5 +40,23 @@
         "email": "ff@fd.s",
         "phone": "+77-33",
         "id": 7
+    },
+    {
+        "name": "Censor",
+        "email": "citizen@m.com",
+        "phone": "90-83-23",
+        "id": 8
+    },
+    {
+        "name": "Vincent",
+        "email": "vgs@jj.com",
+        "phone": "88-34-12",
+        "id": 9
+    },
+    {
+        "name": "Zinovyi Gerdt",
+        "email": "gz@mail.ru",
+        "phone": "+7-23-42",
+        "id": 10
     }
 ]

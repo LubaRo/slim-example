@@ -28,3 +28,14 @@ ul {
 div {
     padding: 5px 0;
 }
+.notifications-bar {
+    border: 1px dashed gray;
+}
+
+.message-error {
+    color: red;
+}
+
+.message-success {
+    color: green;
+}

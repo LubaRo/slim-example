@@ -11,6 +11,8 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use App\Validator;
 
+session_start();
+
 $container = new Container();
 AppFactory::setContainer($container);
 
@@ -20,6 +22,9 @@ $container->set('view', function() {
         'auto_reload' => true
     ];
     return Twig::create(TEMPLATES_DIR_PATH, $params);
+});
+$container->set('flash', function () {
+    return new \Slim\Flash\Messages();
 });
 
 $app = AppFactory::create();
@@ -82,14 +87,20 @@ $app->get('/', function (Request $request, Response $response, $args) use ($rout
 $app->get('/users', function (Request $request, Response $response, $args) {
     $renderer = $this->get('view');
     $users = getUsers();
-    $data = ['title' => 'Users', 'users' => $users];
+    $data = [
+        'title' => 'Users',
+        'users' => $users,
+        'messages' => $this->get('flash')->getMessages()
+    ];
 
     return $renderer->render($response, "users.twig", $data);
-})->setName('users');;
+})->setName('users');
 
 $app->get('/users/new', function (Request $request, Response $response, $args) {
     $renderer = $this->get('view');
-    $data = ['title' => 'Create user'];
+    $data = [
+        'title' => 'Create user'
+    ];
 
     return $renderer->render($response, "users_new.twig", $data);
 })->setName('newUser');
@@ -106,6 +117,7 @@ $app->post('/users', function (Request $request, Response $response) use ($route
             'title' => 'Create user',
             'errors' => $errors
         ];
+
         return $renderer->render($response, "users_new.twig", $data);
     }
 
@@ -115,9 +127,10 @@ $app->post('/users', function (Request $request, Response $response) use ($route
 
     $allUsers[] = $userData;
     saveUsers($allUsers);
+    $this->get('flash')->addMessage('success', 'New user was added!');
 
     return $response
-        ->withHeader('Location',$routeParser->urlFor('users'))
+        ->withHeader('Location', $routeParser->urlFor('users'))
         ->withStatus(302);
 });
 
