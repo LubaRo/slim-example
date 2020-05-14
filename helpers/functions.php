@@ -76,3 +76,25 @@ function getUser($id)
     $users = getUsers();
     return collect($users)->firstWhere('id', $id);
 }
+
+function updateUser($data)
+{
+    $id = $data['id'];
+
+    $newUsers = array_map(function($elem) use ($id, $data) {
+        if ($elem['id'] == $id) {
+            $elem = array_merge($elem, $data);
+        }
+        return $elem;
+    }, getUsers());
+
+    saveUsers($newUsers);
+    return true;
+}
+
+function deleteUser($id)
+{
+    $newUsers = array_filter(getUsers(), fn($elem) => $elem['id'] != $id);
+    saveUsers($newUsers);
+    return true;
+}

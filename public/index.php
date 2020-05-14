@@ -9,6 +9,7 @@ use Slim\Psr7\Response;
 use DI\Container;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use Slim\Middleware\MethodOverrideMiddleware;
 
 session_start();
 
@@ -29,6 +30,7 @@ $container->set('flash', function () {
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 $app->add(TwigMiddleware::createFromContainer($app));
+$app->add(MethodOverrideMiddleware::class);
 
 $routeParser = $app->getRouteCollector()->getRouteParser();
 
@@ -145,12 +147,27 @@ $app->get('/user/{id}', function (Request $request, Response $response, $args) {
     return $this->get('view')->render($response, "users/show.twig", $data);
 })->setName('user');
 
+$app->get('/users/{id}/edit', function (Request $request, Response $response, $args) {
+    $id = $args['id'];
+    $userData = getUser($id);
+    if (!$userData) {
+        $newResponse = $response->withStatus(NOT_FOUND);
+        return $this->get('view')->render($newResponse, "not_found.twig", ['title' => 'Not found']);
+    }
+    $data = [
+        'title' => 'User profile',
+        'user' => $userData
+    ];
+
+    return $this->get('view')->render($response, "users/edit.twig", $data);
+})->setName('edit_user');
+
 $app->get('/users/new', function (Request $request, Response $response, $args) {
     $data = [
         'title' => 'Create user'
     ];
     return $this->get('view')->render($response, "users/new.twig", $data);
-})->setName('newUser');
+})->setName('new_user');
 
 $app->post('/users', function (Request $request, Response $response) use ($routeParser) {
     $userData = $request->getParsedBody()['user'];
@@ -171,6 +188,37 @@ $app->post('/users', function (Request $request, Response $response) use ($route
         ->withHeader('Location', $routeParser->urlFor('users'))
         ->withStatus(302);
 });
+
+$app->patch('/users', function (Request $request, Response $response) use ($routeParser) {
+    $userData = $request->getParsedBody()['user'];
+    $errors = validateUser($userData);
+
+    if ($errors) {
+        $data = [
+            'user' => $userData,
+            'title' => 'Updating user',
+            'errors' => $errors
+        ];
+        return $this->get('view')->render($response->withStatus(422), "users/edit.twig", $data);
+    }
+
+    updateUser($userData);
+    $this->get('flash')->addMessage('success', 'User was updates!');
+
+    return $response
+        ->withHeader('Location', $routeParser->urlFor('users'))
+        ->withStatus(302);
+});
+
+$app->delete('/user/{id}', function (Request $request, Response $response, $args) use ($routeParser) {
+    $id = $args['id'];
+    deleteUser($id);
+    $this->get('flash')->addMessage('success', 'User was deleted!');
+
+    return $response
+        ->withHeader('Location', $routeParser->urlFor('users'))
+        ->withStatus(302);
+})->setName('delete_user');;
 
 $app->get('/', function (Request $request, Response $response, $args) {
     $params = $request->getQueryParams();

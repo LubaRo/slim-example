@@ -8,6 +8,7 @@
         <th>NAME</th>
         <th>E-mail</th>
         <th>PHONE</th>
+        <th>&nbsp;</th>
     </tr>
     {% for user in users %}
     <tr>
@@ -15,13 +16,19 @@
         <td><a href="{{ url_for('user', { 'id': user.id }) }}">{{ user.name }}</a></td>
         <td>{{ user.email }}</td>
         <td>{{ user.phone }}</td>
+        <td>
+            <form action="{{ url_for('delete_user', { 'id': user.id }) }}" method="post">
+                <input type="hidden" name="_METHOD" value="DELETE">
+                <input type="submit" value="X">
+            </form>
+        </td>
     </tr>
     {% endfor %}
 </table>
 {% endif %}
 
 <div>
-    <a href="{{ url_for('newUser') }}">Add new user</a>
+    <a href="{{ url_for('new_user') }}">Add new user</a>
 </div>
 
 {% endblock %}

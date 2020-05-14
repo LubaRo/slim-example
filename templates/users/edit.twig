@@ -1,0 +1,37 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <h1>Editing user info</h1>
+    {% if errors %}
+        <div class="errors">
+            {% for field, errorTxt in errors %}
+                <p><b>Field <i>{{ field }}</i>:</b> {{ errorTxt }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form action="{{ url_for('users') }}" method="POST">
+        <input type="hidden" name="_METHOD" value="PATCH">
+        <input type="hidden" name="user[id]" value="{{ user.id }}">
+
+            <div>
+                <label>Name:
+                    <input type="text" required name="user[name]" value="{{ user.name }}">
+                </label>
+            </div>
+            <div>
+                <label>E-mail:
+                    <input type="emil" required name="user[email]" value="{{ user.email }}">
+                </label>
+            </div>
+            <div>
+                <label>Phone:
+                    <input type="tel" name="user[phone]" value="{{ user.phone }}">
+                </label>
+            </div>
+
+        <input type="submit" value="Update">
+    </form>
+
+    <br>
+    <a href="{{ url_for('users') }}">Back to list</a>
+{% endblock %}
