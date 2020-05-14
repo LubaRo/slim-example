@@ -218,7 +218,7 @@ $app->delete('/user/{id}', function (Request $request, Response $response, $args
     return $response
         ->withHeader('Location', $routeParser->urlFor('users'))
         ->withStatus(302);
-})->setName('delete_user');;
+})->setName('delete_user');
 
 $app->get('/', function (Request $request, Response $response, $args) {
     $params = $request->getQueryParams();
