@@ -1,21 +1,7 @@
 <?php
 
 use App\Validator;
-
-function getUsers()
-{
-    $filePath = ROOT_DIR . 'storage/data/users.json';
-    $fileData = file_get_contents($filePath);
-    $users = json_decode($fileData, true);
-
-    return $users;
-}
-
-function saveUsers($data)
-{
-    $filePath = ROOT_DIR . 'storage/data/users.json';
-    file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT));
-}
+use Slim\Psr7\Cookies;
 
 function getAllCompanies()
 {
@@ -54,30 +40,46 @@ function findCompany($search)
     return $foundCompanies;
 }
 
+function getUsers($request)
+{
+    $cookies = Cookies::parseHeader($request->getHeader('Cookie'));
+    $usersCookie = $cookies['users'] ?? '';
+    $usersDecoded = json_decode($usersCookie, true);
+
+    return $usersDecoded;
+}
+
 function validateUser($userData)
 {
     $validator = new Validator();
     return $validator->validate($userData);
 }
 
-function createUser($userData)
+function getUser($request, $id)
 {
-    $allUsers = getUsers();
-    $lastUser = collect($allUsers)->last();
-    $userData['id'] = $lastUser ? $lastUser['id'] + 1 : 1;
-
-    $allUsers[] = $userData;
-    saveUsers($allUsers);
-    return true;
-}
-
-function getUser($id)
-{
-    $users = getUsers();
+    $users = getUsers($request);
     return collect($users)->firstWhere('id', $id);
 }
 
-function updateUser($data)
+
+function saveUsers($data)
+{
+    $filePath = ROOT_DIR . 'storage/data/users.json';
+    file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+function addNewUser($userData, $request)
+{
+    $allUsers = getUsers($request);
+    $lastUser = collect($allUsers)->last();
+
+    $userData['id'] = $lastUser ? $lastUser['id'] + 1 : 1;
+    $allUsers[] = $userData;
+
+    return $allUsers;
+}
+
+function updateUser($data, $request)
 {
     $id = $data['id'];
 
@@ -86,15 +88,13 @@ function updateUser($data)
             $elem = array_merge($elem, $data);
         }
         return $elem;
-    }, getUsers());
+    }, getUsers($request));
 
-    saveUsers($newUsers);
-    return true;
+    return $newUsers;
 }
 
-function deleteUser($id)
+function deleteUser($id, $request)
 {
-    $newUsers = array_filter(getUsers(), fn($elem) => $elem['id'] != $id);
-    saveUsers($newUsers);
-    return true;
+    $newUsers = array_filter(getUsers($request), fn($elem) => $elem['id'] != $id);
+    return $newUsers;
 }

@@ -123,9 +123,10 @@ $app->get('/styles/{file}', function (Request $request, Response $response, arra
 })->setName('styles');
 
 $app->get('/users', function (Request $request, Response $response, $args) {
+    $users = getUsers($request);
     $data = [
         'title' => 'Users',
-        'users' => getUsers(),
+        'users' => $users,
         'messages' => $this->get('flash')->getMessages()
     ];
 
@@ -134,7 +135,7 @@ $app->get('/users', function (Request $request, Response $response, $args) {
 
 $app->get('/user/{id}', function (Request $request, Response $response, $args) {
     $id = $args['id'];
-    $userData = getUser($id);
+    $userData = getUser($request, $id);
     if (!$userData) {
         $newResponse = $response->withStatus(NOT_FOUND);
         return $this->get('view')->render($newResponse, "not_found.twig", ['title' => 'Not found']);
@@ -149,7 +150,7 @@ $app->get('/user/{id}', function (Request $request, Response $response, $args) {
 
 $app->get('/users/{id}/edit', function (Request $request, Response $response, $args) {
     $id = $args['id'];
-    $userData = getUser($id);
+    $userData = getUser($request, $id);
     if (!$userData) {
         $newResponse = $response->withStatus(NOT_FOUND);
         return $this->get('view')->render($newResponse, "not_found.twig", ['title' => 'Not found']);
@@ -181,11 +182,14 @@ $app->post('/users', function (Request $request, Response $response) use ($route
         return $this->get('view')->render($response, "users/new.twig", $data);
     }
 
-    createUser($userData);
+    $newUserList = addNewUser($userData, $request);
+    $usersEncoded = json_encode($newUserList);
+
     $this->get('flash')->addMessage('success', 'New user was added!');
 
     return $response
         ->withHeader('Location', $routeParser->urlFor('users'))
+        ->withHeader('Set-Cookie', "users=$usersEncoded; HttpOnly; Path=/; Max-Age=432000")
         ->withStatus(302);
 });
 
@@ -202,21 +206,27 @@ $app->patch('/users', function (Request $request, Response $response) use ($rout
         return $this->get('view')->render($response->withStatus(422), "users/edit.twig", $data);
     }
 
-    updateUser($userData);
+    $newUserList = updateUser($userData, $request);
+    $usersEncoded = json_encode($newUserList);
+
     $this->get('flash')->addMessage('success', 'User was updates!');
 
     return $response
         ->withHeader('Location', $routeParser->urlFor('users'))
+        ->withHeader('Set-Cookie', "users=$usersEncoded; HttpOnly; Path=/; Max-Age=432000")
         ->withStatus(302);
 });
 
 $app->delete('/user/{id}', function (Request $request, Response $response, $args) use ($routeParser) {
-    $id = $args['id'];
-    deleteUser($id);
+    $userId = $args['id'];
+    $newUserList = deleteUser($userId, $request);
+
+    $usersEncoded = json_encode($newUserList);
     $this->get('flash')->addMessage('success', 'User was deleted!');
 
     return $response
         ->withHeader('Location', $routeParser->urlFor('users'))
+        ->withHeader('Set-Cookie', "users=$usersEncoded; HttpOnly; Path=/; Max-Age=432000")
         ->withStatus(302);
 })->setName('delete_user');
 
