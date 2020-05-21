@@ -3,6 +3,11 @@
 use App\Validator;
 use Slim\Psr7\Cookies;
 
+function prettyPrint($data)
+{
+    print("<pre>" . print_r($data, true) . "</pre>");
+}
+
 function getAllCompanies()
 {
     return App\Generator::generateCompanies(100);
@@ -61,7 +66,6 @@ function getUser($request, $id)
     return collect($users)->firstWhere('id', $id);
 }
 
-
 function saveUsers($data)
 {
     $filePath = ROOT_DIR . 'storage/data/users.json';
@@ -83,7 +87,7 @@ function updateUser($data, $request)
 {
     $id = $data['id'];
 
-    $newUsers = array_map(function($elem) use ($id, $data) {
+    $newUsers = array_map(function ($elem) use ($id, $data) {
         if ($elem['id'] == $id) {
             $elem = array_merge($elem, $data);
         }
