@@ -19,9 +19,15 @@ AppFactory::setContainer($container);
 $container->set('view', function () {
     $params = [
         'cache' => CACHE_DIR . 'twig/',
-        'auto_reload' => true
+        'auto_reload' => true,
+        'debug' => true
     ];
-    return Twig::create(TEMPLATES_DIR_PATH, $params);
+    $twig = Twig::create(TEMPLATES_DIR_PATH, $params);
+
+    //add the debug extention for ability to dump variables
+    $twig->addExtension(new \Twig\Extension\DebugExtension());
+
+    return $twig;
 });
 $container->set('flash', function () {
     return new \Slim\Flash\Messages();
@@ -243,7 +249,7 @@ $app->get('/', function (Request $request, Response $response, $args) {
         'foundData' => $foundData
     ];
     return $this->get('view')->render($response, "index.twig", $templateData);
-});
+})->setName('home');;
 
 // Run app
 $app->run();
