@@ -1,7 +1,7 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-    <h1>Editing user info</h1>
+    <h1 class="mt-5">Editing user info</h1>
     {% if errors %}
         <div class="errors">
             {% for field, errorTxt in errors %}
@@ -9,29 +9,20 @@
             {% endfor %}
         </div>
     {% endif %}
-    <form action="{{ url_for('users') }}" method="POST">
-        <input type="hidden" name="_METHOD" value="PATCH">
-        <input type="hidden" name="user[id]" value="{{ user.id }}">
+    <div class="mt-4">
+        <form action="{{ url_for('users') }}" method="POST">
+            <input type="hidden" name="_METHOD" value="PATCH">
+            <input type="hidden" name="user[id]" value="{{ user.id }}">
 
-            <div>
-                <label>Name:
-                    <input type="text" required name="user[name]" value="{{ user.name }}">
-                </label>
-            </div>
-            <div>
-                <label>E-mail:
-                    <input type="emil" required name="user[email]" value="{{ user.email }}">
-                </label>
-            </div>
-            <div>
-                <label>Phone:
-                    <input type="tel" name="user[phone]" value="{{ user.phone }}">
-                </label>
-            </div>
+            {{ include('users/form_fields.twig') }}
 
-        <input type="submit" value="Update">
-    </form>
-
+            <div class="form-group row">
+                <div class="col-sm-5">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
     <br>
     <a href="{{ url_for('users') }}">Back to list</a>
 {% endblock %}

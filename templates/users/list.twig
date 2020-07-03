@@ -1,34 +1,36 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-{% if users %}
-<table>
-    <tr>
-        <th>ID</th>
-        <th>NAME</th>
-        <th>E-mail</th>
-        <th>PHONE</th>
-        <th>&nbsp;</th>
-    </tr>
-    {% for user in users %}
-    <tr>
-        <td>{{ user.id }}</td>
-        <td><a href="{{ url_for('user', { 'id': user.id }) }}">{{ user.name }}</a></td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.phone }}</td>
-        <td>
-            <form action="{{ url_for('delete_user', { 'id': user.id }) }}" method="post">
-                <input type="hidden" name="_METHOD" value="DELETE">
-                <input type="submit" value="X">
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% endif %}
+    <h1 class="mt-5">Users list</h1>
 
-<div>
-    <a href="{{ url_for('new_user') }}">Add new user</a>
-</div>
+    {% if users %}
+        <table class="mt-4">
+            <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>E-mail</th>
+                <th>PHONE</th>
+                <th>&nbsp;</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td><a href="{{ url_for('user', { 'id': user.id }) }}">{{ user.name }}</a></td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone }}</td>
+                <td>
+                    <form action="{{ url_for('delete_user', { 'id': user.id }) }}" method="post">
+                        <input type="hidden" name="_METHOD" value="DELETE">
+                        <input type="submit" value="X">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <div class="mt-4">
+        <a class="btn btn-primary" href="{{ url_for('new_user') }}">Add new user</a>
+    </div>
 
 {% endblock %}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}{{ title }}{% endblock %}</title>
@@ -10,47 +10,60 @@
         <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
     </head>
-    <body>
+
+    <body class="d-flex flex-column h-100">
         {% block header %}
-            <header class="masthead mb-auto">
-                <div class="inner">
-                    <h3 class="masthead-brand"><a href="/">Home</a></h3>
-                </div>
+            <header>
+                <!-- Fixed navbar -->
+                <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                    <div class="collapse navbar-collapse container" id="navbarCollapse">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="/">Home</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
             </header>
         {% endblock %}
 
-        {% block notifications %}
-            {% if messages %}
-            <div class="notifications-bar">
-                {% if messages.error %}
-                    <div class="message-error">
-                        {% for message in messages.error %}
-                            <p>{{ message }}</p>
-                        {% endfor %}
+        <!-- Page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                {% block notifications %}
+                    {% if messages %}
+                    <div class="notifications-bar">
+                        {% if messages.error %}
+                            <div class="message-error">
+                                {% for message in messages.error %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if messages.success %}
+                            <div class="message-success">
+                                {% for message in messages.success %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-                {% if messages.success %}
-                    <div class="message-success">
-                        {% for message in messages.success %}
-                            <p>{{ message }}</p>
-                        {% endfor %}
+                    {% endif %}
+                {% endblock %}
+                {% block body %}
+                    <div id="content">
+                        {% block content %}{% endblock %}
                     </div>
-                {% endif %}
+                {% endblock %}
             </div>
-            {% endif %}
-        {% endblock %}
-        {% block body %}
-            <div id="content">
-                {% block content %}{% endblock %}
-            </div>
-        {% endblock %}
+        </main>
 
         {% block footer %}
-        <footer class="mastfoot mt-auto">
-            <div class="inner">
-                <p>&#169;Sandbox development</p>
-            </div>
-        </footer>
+            <footer class="footer mt-auto py-3">
+                <div class="container">
+                    <span class="text-muted">&#169;&nbsp;Sandbox development</span>
+                </div>
+            </footer>
         {% endblock %}
     </body>
 </html>

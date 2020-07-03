@@ -1,0 +1,18 @@
+<div class="form-group row">
+    <label for="inputName" class="col-sm-1 col-form-label">Name:</label>
+    <div class="col-sm-5">
+        <input type="text" class="form-control" id="inputName" placeholder="Name" required name="user[name]" value="{% if user.name %}{{ user.name }}{% endif %}">
+    </div>
+</div>
+<div class="form-group row">
+    <label for="inputEmail" class="col-sm-1 col-form-label">Email:</label>
+    <div class="col-sm-5">
+        <input type="email" class="form-control" id="inputEmail" placeholder="Email" required name="user[email]" value="{% if user.email %}{{ user.email }}{% endif %}">
+    </div>
+</div>
+<div class="form-group row">
+    <label for="inputPhone" class="col-sm-1 col-form-label">Phone:</label>
+    <div class="col-sm-5">
+        <input type="tel" class="form-control" id="inputPhone" placeholder="Phone" required name="user[phone]" value="{% if user.phone %}{{ user.phone }}{% endif %}">
+    </div>
+</div>

@@ -1,13 +1,13 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-    <h1>Slim says you HELLO and WELCOME!</h1>
-    <p>This is the twig content ^-^</p>
+    <h1 class="mt-5">Slim says you HELLO and WELCOME!</h1>
+    <p class="lead">This is the twig content ^-^</p>
 
     <div class="main-content">
         <form action="/" method="get">
             <div class="input-group mb-3">
-                <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Find your company" />
+                <input type="text" class="form-control col-sm-5" name="search" value="{{ search }}" placeholder="Find your company" />
 
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit">Search</button>
