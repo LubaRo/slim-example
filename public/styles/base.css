@@ -1,3 +1,18 @@
+body {
+    height: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 5px 0;
+    background-color: #eee;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    height: 100px;
+
+  }
+
 .current-page a {
     background-color: green;
     padding: 3px 5px;
@@ -5,12 +20,7 @@
     color: #fff;
     font-weight: bold;
 }
-body {
-    max-width: 620px;
-    margin: 0 auto;
-    padding: 5px 0;
-    background-color: #eee;
-}
+
 .bold {
     font-weight: bold;
 }
@@ -18,16 +28,7 @@ body {
     border: 1px green dashed;
     margin: 5px;
 }
-p {
-    padding: 0 5px;
 
-}
-ul {
-    padding: 0;
-}
-div {
-    padding: 5px 0;
-}
 .notifications-bar {
     border: 1px dashed gray;
 }

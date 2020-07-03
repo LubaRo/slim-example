@@ -1,13 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}{{ title }}{% endblock %}</title>
         {% block stylesheets %}
+            <link rel="stylesheet" type="text/css" href="{{ base_path() }}/styles/bootstrap.min.css"/>
             <link rel="stylesheet" type="text/css" href="{{ base_path() }}/styles/base.css"/>
         {% endblock %}
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
     </head>
     <body>
+        {% block header %}
+            <header class="masthead mb-auto">
+                <div class="inner">
+                    <h3 class="masthead-brand"><a href="/">Home</a></h3>
+                </div>
+            </header>
+        {% endblock %}
+
         {% block notifications %}
             {% if messages %}
             <div class="notifications-bar">
@@ -35,9 +46,11 @@
         {% endblock %}
 
         {% block footer %}
-            <div class="footer">
-                <a href="/">Go back home</a>
+        <footer class="mastfoot mt-auto">
+            <div class="inner">
+                <p>&#169;Sandbox development</p>
             </div>
+        </footer>
         {% endblock %}
     </body>
 </html>
