@@ -4,18 +4,20 @@ namespace App;
 
 class Validator
 {
+    private $errorTxt = "Can't be blank";
+
     public function validate(array $course)
     {
         $errors = [];
 
         if (empty($course['name'])) {
-            $errors['name'] = "Can't be blank";
+            $errors['name'] = $this->errorTxt;
         }
         if (empty($course['email'])) {
-            $errors['email'] = "Can't be blank";
+            $errors['email'] = $this->errorTxt;
         }
         if (empty($course['phone'])) {
-            $errors['phone'] = "Can't be blank";
+            $errors['phone'] = $this->errorTxt;
         }
 
         return $errors;
