@@ -165,7 +165,8 @@ $app->get('/users/{id}/edit', function (Request $request, Response $response, $a
 
 $app->get('/users/new', function (Request $request, Response $response, $args) {
     $data = [
-        'title' => 'Create user'
+        'title' => 'Create user',
+        'user' => []
     ];
     return $this->get('view')->render($response, "users/new.twig", $data);
 })->setName('new_user');
@@ -177,6 +178,7 @@ $app->post('/users', function (Request $request, Response $response) use ($route
     if ($errors) {
         $data = [
             'title' => 'Create user',
+            'user' => $userData,
             'errors' => $errors
         ];
         return $this->get('view')->render($response, "users/new.twig", $data);
