@@ -4,29 +4,36 @@
     <h1 class="mt-5">Users list</h1>
 
     {% if users %}
-        <table class="mt-4">
-            <tr>
-                <th>ID</th>
-                <th>NAME</th>
-                <th>E-mail</th>
-                <th>PHONE</th>
-                <th>&nbsp;</th>
-            </tr>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td><a href="{{ url_for('user', { 'id': user.id }) }}">{{ user.name }}</a></td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.phone }}</td>
-                <td>
-                    <form action="{{ url_for('delete_user', { 'id': user.id }) }}" method="post">
-                        <input type="hidden" name="_METHOD" value="DELETE">
-                        <input type="submit" value="X">
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td><a href="{{ url_for('user', { 'id': user.id }) }}">{{ user.name }}</a></td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_user', { 'id': user.id }) }}" method="post">
+                            <input type="hidden" name="_METHOD" value="DELETE">
+                            
+                            <input class="btn btn-outline-danger" type="submit" value="X">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
+    {% else %}
+        <p class="mt-5">The user list is empty. But you can add the necessary users!</p>
     {% endif %}
 
     <div class="mt-4">
